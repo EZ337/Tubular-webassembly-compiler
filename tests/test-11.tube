@@ -1,0 +1,5 @@
+// Indexing
+function LetterG() : char {
+  string s = "AUGMENT";
+  return s[2];
+}

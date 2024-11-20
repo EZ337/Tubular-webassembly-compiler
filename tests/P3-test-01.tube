@@ -1,0 +1,2 @@
+// Test the simplest possible function, returning a fixed value.
+function Get42() : int { return 42; }

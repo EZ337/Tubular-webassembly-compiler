@@ -1,0 +1,2 @@
+// Functions must have a return type specified.
+function Error3(int x) { return x; }

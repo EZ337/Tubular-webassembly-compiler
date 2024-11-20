@@ -1,0 +1,2 @@
+// Appending string literals.
+function HelloPlus() : string { return "Hello" + " World!"; }

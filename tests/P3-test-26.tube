@@ -1,0 +1,24 @@
+// Test multiple different breaks.
+// Find the next prime starting at a given value.
+function FindPrime(int value) : int {
+  while (1) {  // Infinite loop until break
+    int is_prime = 1;
+    int test_factor = 2;
+    int test_cap = sqrt(value):int;
+
+    // Is this value prime?
+    while (test_factor <= test_cap) {
+      if (value % test_factor == 0) {
+        is_prime = 0;
+        break;  // Not a prime, move on to the next value
+      }
+      test_factor = test_factor + 1;
+    }
+
+    if (is_prime) break;  // Prime found, exit loop
+
+    value = value + 1;
+  }
+
+  return value;
+}

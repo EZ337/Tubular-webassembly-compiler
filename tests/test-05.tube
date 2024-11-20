@@ -1,0 +1,2 @@
+// String literals.
+function Hello() : string { return "Hello World!"; }

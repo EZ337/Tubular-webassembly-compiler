@@ -1,0 +1,9 @@
+// Take advantage of multiply with char to make a padding string.
+function AddPadding2(string str, int target_size, char pad) : string {
+  int start_size = size(str);
+  if (start_size < target_size) {
+    string padding = pad * (target_size - start_size);
+    return str + padding;
+  }
+  return str;
+}

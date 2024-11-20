@@ -1,0 +1,6 @@
+// Functions shouldn't do anything after a return statement.
+function PastReturn(int x) : int {
+  int y = x + 10;
+  return y;
+  y = y * 2;
+}

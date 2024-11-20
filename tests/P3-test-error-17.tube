@@ -1,0 +1,9 @@
+// Cannot have a "break" outside of a loop.
+function InvalidBreak() : int {
+  int x = 1;
+  while (x < 10) {
+    x = x * 2;
+  }
+  break;
+  return x;
+}

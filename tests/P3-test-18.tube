@@ -1,0 +1,9 @@
+// Simple char math.
+function ToUpper(char c) : char {
+  // Test if lower case.
+  if (c >= 'a' && c <= 'z') {
+    int shift = 'a' - 'A';
+    return c - shift;
+  }
+  return c; // Not lower!
+}

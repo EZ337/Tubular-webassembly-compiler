@@ -1,0 +1,5 @@
+// Make sure sqrt works (Calculate the length of a hypotenuse.)
+function CalcHypotenuse(double sideA, double sideB) : double {
+  double c_sqr = sideA * sideA + sideB * sideB;
+  return sqrt(c_sqr);
+}

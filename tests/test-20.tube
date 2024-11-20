@@ -1,0 +1,17 @@
+// Convert an int into a string.
+function Int2String(int val) : string {
+  if (val == 0) return "0";
+  string digits = "0123456789";
+  int is_neg = 0;
+  if (val < 0) {
+    is_neg = 1;
+    val = val * -1;
+  }
+  string out = "";
+  while (val > 0) {
+    out = digits[val % 10] + out;
+    val = val / 10;
+  }
+  if (is_neg) out = '-' + out;
+  return out;
+}

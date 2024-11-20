@@ -1,0 +1,5 @@
+// Make a string variable.
+function One() : string {
+  string one = "ONE";
+  return one;
+}

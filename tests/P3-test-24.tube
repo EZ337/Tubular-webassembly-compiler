@@ -1,0 +1,18 @@
+// Test continue.
+// Count the number of ints divisible by seven between two floating point values.
+function CountDivSeven(double min, double max) : int {
+  int value = min:int;
+  int stop = max:int;
+  int count = 0;
+  // Adjust start value if floor is not included in min.
+  if (value:double < min) value = value + 1;
+  while (value <= stop) {
+    if (value % 7 != 0) {
+      value = value + 1;
+      continue;
+    }
+    count = count + 1;
+    value = value + 7;
+  }
+  return count;
+}

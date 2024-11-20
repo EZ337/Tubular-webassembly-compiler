@@ -1,0 +1,4 @@
+// Doubles cannot be modded together.
+function ErrorMod(double d1, double d2) : double {
+  return d1 % d2;
+}

@@ -1,0 +1,4 @@
+// All paths through a function must end up with a return.
+function FlowError(int x) : int {
+  if (x < 10) return 10;
+}

@@ -1,0 +1,4 @@
+// Test unary NOT ('!') and modulus ('%')
+function TestEven(int test) : int {
+  return !(test % 2);
+}

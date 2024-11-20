@@ -1,0 +1,2 @@
+// Two chars can't be multiplied.
+function MultC(char c1, char c2) : char { return c1 * c2; }

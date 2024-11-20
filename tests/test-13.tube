@@ -1,0 +1,5 @@
+// Safe indexing (a test of the size function)
+function At(string str, int index) : char {
+  if (index < 0 || index >= size(str)) return '?';
+  return str[index];
+}

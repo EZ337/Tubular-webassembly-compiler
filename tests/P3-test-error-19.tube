@@ -1,0 +1,9 @@
+// < is non-associative
+// == is non-associative
+function InvalidLess() : int {
+  int x = 11;
+  int y = 12;
+  int z = 13;
+  if (x < y < z) return 1;
+  return 2;
+}

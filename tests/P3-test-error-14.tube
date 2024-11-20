@@ -1,0 +1,4 @@
+// A char cannot be involved in division
+function ErrorDivChar(char c) : double {
+  return c / 2;
+}

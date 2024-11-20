@@ -1,0 +1,2 @@
+// Functions must have a 'return' statement.
+function AddError(int x, int y) : int { x + y; }

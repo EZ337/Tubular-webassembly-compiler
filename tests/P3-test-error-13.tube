@@ -1,0 +1,4 @@
+// A char cannot be involved in multiplication
+function ErrorMultChar(double v1, char v2) : double {
+  return v1 * v2;
+}

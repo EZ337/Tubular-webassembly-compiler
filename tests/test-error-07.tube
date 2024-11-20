@@ -1,0 +1,4 @@
+// Cannot index into a non-array type.
+function ErrorFun(int x) : char {
+  return x[7];
+}

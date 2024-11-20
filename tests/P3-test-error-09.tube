@@ -1,0 +1,5 @@
+// An int variable cannot be set to a floating point value.
+function TypeError(double val) : int {
+  int x = val;
+  return x;
+}

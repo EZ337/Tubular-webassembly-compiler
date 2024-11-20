@@ -1,0 +1,2 @@
+// Test the simplest I/O function, passing a value through.
+function Echo(int x) : int { return x; }

@@ -1,0 +1,5 @@
+// Add padding by adding on values one at a time.
+function AddPadding(string str, int target_size, char pad) : string {
+  while (size(str) < target_size) str = str + pad;
+  return str;
+}

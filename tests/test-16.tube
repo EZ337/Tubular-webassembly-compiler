@@ -1,0 +1,4 @@
+// Make sure characters can be converted to strings.
+function MergeChars(char a, char b) : string {
+  return a:string + b;
+}

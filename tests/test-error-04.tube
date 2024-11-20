@@ -1,0 +1,7 @@
+// Cannot automatically narrow an argument in a function call.
+function Add(int val1, int val2) : int {
+  return val1 + val2;
+}
+function ErrorFun(int val1, double val2) : int {
+  return Add(val1, val2); // Second arg cannot be a double.
+}

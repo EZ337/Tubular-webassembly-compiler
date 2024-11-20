@@ -1,0 +1,10 @@
+// Test multiple functions in the same file
+function Plus1(int in) : int {
+  return in + 1;
+}
+function PlusOneHalf(double in) : double {
+  return in + 0.5;
+}
+function HalfAgain(double in) : double {
+  return in * 1.5;
+}

@@ -1,0 +1,11 @@
+// Reused variable names in different scopes
+function Logish(double value) : int {
+  int count = 0;
+  while (value > 1.5) {
+    count = count + 1;
+    value = value / 2;
+    double count = 100;
+    count = count * value:int;
+  }
+  return count;
+}

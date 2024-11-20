@@ -1,0 +1,8 @@
+// Test calling the same function more than once.
+function Inc(int val) : int {
+  return val + 1;
+}
+function Inc2(int val) : int {
+  int part = Inc(val);
+  return Inc(part);
+}

@@ -1,0 +1,2 @@
+// Make sure char types work.
+function EchoC(char c) : char { return c; }

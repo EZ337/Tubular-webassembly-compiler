@@ -1,0 +1,4 @@
+// Cannot run size() on a non-string type.
+function ErrorFun(int x) : int {
+  return size(x);
+}

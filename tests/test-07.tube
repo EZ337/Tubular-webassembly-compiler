@@ -1,0 +1,2 @@
+// Combining string literals and char literals.
+function HelloPlusPlus() : string { return "Hello" + ' ' + "World!"; }

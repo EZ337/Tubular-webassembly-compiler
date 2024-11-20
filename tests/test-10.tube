@@ -1,0 +1,4 @@
+// Take in a string variable as an argument.
+function Bracketize(string in) : string {
+  return '[' + in + ']';
+}

@@ -1,0 +1,6 @@
+// Use string variables in an expression.
+function TwentyOne() : string {
+  string twenty = "TWENTY";
+  string one = "one";
+  return twenty + one;
+}

@@ -1,0 +1,2 @@
+// Simple math with doubles.
+function AddD (double x, double y) : double { return x + y; }

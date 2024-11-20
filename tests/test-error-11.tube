@@ -1,0 +1,4 @@
+// Cannot run size() with multiple arguments.
+function ErrorFun(string in1, string in2) : int {
+  return size(in1, in2);
+}

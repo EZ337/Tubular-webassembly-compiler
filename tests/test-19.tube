@@ -1,0 +1,18 @@
+// Convert an int into a string.
+function String2Int(string in) : int {
+  if (size(in) == 0) return 0;
+  int out = 0;
+  int pos = 0;
+  int is_neg = 0;
+  if (in[0] == '-') {
+    is_neg = 1;
+    pos = 1;
+  }
+  while (pos < size(in)) {
+    out = out * 10;
+    out = out + in[pos] - '0';
+    pos = pos + 1;
+  }
+  if (is_neg) out = 0 - out;
+  return out;
+}

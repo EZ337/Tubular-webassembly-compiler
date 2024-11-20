@@ -1,0 +1,14 @@
+// Calculate the specified Fibonacci number
+function Fibonacci(int n) : int {
+  if (n < 2) return n;
+  int val1 = 0;
+  int val2 = 1;
+  int step = 2;
+  while (step <= n) {
+    int sum = val1 + val2;
+    val1 = val2;
+    val2 = sum;
+    step = step + 1;
+  }
+  return val2;
+}

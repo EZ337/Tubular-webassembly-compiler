@@ -1,0 +1,8 @@
+// Must be able to type check on function return type.
+function Add(int val1, int val2) : int {
+  return val1 + val2;
+}
+function ErrorFun(int val1, int val2) : char {
+  char result = Add(val1, val2);  // Cannot implicitly convert int to char.
+  return result;
+}

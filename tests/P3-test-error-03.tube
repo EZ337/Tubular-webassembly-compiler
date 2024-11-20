@@ -1,0 +1,2 @@
+// Function parameters must have a type.
+function Error1(x) : int { return x; }

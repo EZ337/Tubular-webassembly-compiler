@@ -1,0 +1,4 @@
+// Doubles cannot be used in && or ||
+function ErrorAND(double d1, double d2) : int {
+  return d1 && d2;
+}

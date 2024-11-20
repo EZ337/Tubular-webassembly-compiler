@@ -1,0 +1,7 @@
+// Safe setting of a string.
+function SetAt(string str, int index, char c) : string {
+  if (index >= 0 && index < size(str)) {
+    str[index] = c;
+  }
+  return str;
+}

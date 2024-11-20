@@ -1,0 +1,2 @@
+// Function parameters must have a valid type.
+function Error2(var x) : int { return x; }

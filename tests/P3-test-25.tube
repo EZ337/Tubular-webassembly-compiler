@@ -1,0 +1,11 @@
+// Test break.
+// Find the first multiple of 5 after start that is not a multiple of 10.
+// Count the number of NON-multiples of 5.
+function FindNextMult5Not10(int start) : int {
+  while (1) {
+    start = start + 1;
+    if (start % 10 == 0) continue;
+    if (start % 5 == 0) break;
+  }
+  return start;
+}

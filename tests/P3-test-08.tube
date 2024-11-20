@@ -1,0 +1,5 @@
+// Test multiple returns without else
+function Min(int v1, int v2) : int {
+  if (v1 > v2) return v2;
+  return v1;
+}

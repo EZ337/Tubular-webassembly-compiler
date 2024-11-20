@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WASM Tester for Project 4 Tests</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .test { margin-bottom: 20px; }
+    .oddrow { background-color: aliceblue; }
+    .evenrow { background-color:antiquewhite; }
+    .error { color: red; font-weight: bold; }
+    .pass { color: darkgreen; font-weight: bold; }   /* Class for PASS */
+    .fail { color: darkred; font-weight: bold; }     /* Class for FAIL */
+    .waiting { color: gray; font-style: italic; }    /* Class for Waiting */
+  </style>
+</head>
+<body>
+  <h1>WASM Test Runner for Project 4</h1>
+
+  <p>
+  <a href="P3-tester.html">Click here to run tests from Project 3.</a>
+  </p>
+
+  <table id="results-table">
+    <tr style="height: 30px;"><td style="background-color: #ddddff;" colspan="6">
+      <div id="test-summary">
+        <b>TESTS:</b> <b><span class="total_count">0</span></b> &nbsp;&nbsp;&nbsp;
+        <b>PASSED:</b> <span class="pass_count pass">0</span> &nbsp;&nbsp;&nbsp;
+        <b>FAILED:</b> <span class="fail_count fail">0</span> &nbsp;&nbsp;&nbsp;
+        <b>ERRORS:</b> <span class="error_count error">0</span>
+      </div>
+    </td></tr>
+    <tr style="background-color: #dddddd;"><th>File</th><th>Function</th><th>Status</th><th>Input</th><th>Output</th><th>Expected</th></tr>
+    <tr><td>
+      <div id="test-results"></div>
+    </td></tr>
+  </table>
+
+  <script>
+    // Utility to convert memory offset into a string
+    function readStringFromMemory(offset, memoryBuffer) {
+      if (!memoryBuffer) {
+        throw new Error("Cannot read output; 'memory' not exported from WebAssembly module.");
+      }
+
+      let resultString = '';
+      for (let i = offset; memoryBuffer[i] !== 0; i++) {
+        resultString += String.fromCharCode(memoryBuffer[i]);
+      }
+      return resultString;
+    }
+
+    // Function to allocate memory and write the string, returning the offset used.
+    let write_offset = 50000; // (near end of memory...)
+    function writeStringToMemory(string, memoryBuffer) {
+      if (!memoryBuffer) {
+        throw new Error("Cannot send argument; 'memory' not exported from WebAssembly module.");
+      }
+
+      // Write the string into memory as null-terminated
+      const start_offset = write_offset;
+      for (let i = 0; i < string.length; i++) {
+        memoryBuffer[write_offset + i] = string.charCodeAt(i);
+      }
+      memoryBuffer[start_offset + string.length] = 0; // Null terminator
+      write_offset = start_offset + string.length + 1;
+
+      return start_offset;
+    }
+
+    function asLiteral(in_value) {
+      let out_value = in_value;
+      // If the in_value is a string of char, add appropriate quotes.
+      if (typeof in_value === "string") {
+        if (in_value.length == 1) { // We are expecting a char.
+          out_value = "'" + `${in_value}` + "'";
+        } else { // We are expecting a full string.
+          out_value = '"' + `${in_value}` + '"';
+        }
+      }
+      return out_value;
+    }
+
+    // Define the expected outputs for the test cases
+    const testCases = [
+      { id: 1, fun_name: "Add",  args: [4, 11], expected: 15 },
+      { id: 1, fun_name: "Add3", args: [4, 11, 100], expected: 115 },
+      { id: 1, fun_name: "Add3", args: [32, 64, 127], expected: 223 },
+
+      { id: 2, fun_name: "Inc", args: [3], expected: 4 },
+      { id: 2, fun_name: "Inc2", args: [10], expected: 12 },
+
+      { id: 3, fun_name: "Mult", args: [2, 3], expected: 6 },
+      { id: 3, fun_name: "Mult", args: [5, 1000], expected: 5000 },
+      { id: 3, fun_name: "Mult4", args: [2, 3, 4, 5], expected: 120 },
+      { id: 3, fun_name: "Mult4", args: [1.5, 0.5, 20, 0.5], expected: 7.5 },      
+
+      { id: 4, fun_name: "Get3", args: [], expected: 3 },
+
+      { id: 5, fun_name: "Hello", args: [], expected: "Hello World!" },
+
+      { id: 6, fun_name: "HelloPlus", args: [], expected: "Hello World!" },
+
+      { id: 7, fun_name: "HelloPlusPlus", args: [], expected: "Hello World!" },
+
+      { id: 8, fun_name: "One", args: [], expected: "ONE" },
+
+      { id: 9, fun_name: "TwentyOne", args: [], expected: "TWENTYone" },
+
+      { id: 10, fun_name: "Bracketize", args: ["abc"], expected: "[abc]" },
+      { id: 10, fun_name: "Bracketize", args: ["INDEX"], expected: "[INDEX]" },
+      { id: 10, fun_name: "Bracketize", args: ["xyz123"], expected: "[xyz123]" },
+
+      { id: 11, fun_name: "LetterG", args: [], expected: "G" },
+
+      { id: 12, fun_name: "ToLetter", args: [0], expected: "A" },
+      { id: 12, fun_name: "ToLetter", args: [9], expected: "J" },
+      { id: 12, fun_name: "ToLetter", args: [24], expected: "Y" },
+      { id: 12, fun_name: "ToLetter", args: [30], expected: "?" },
+      { id: 12, fun_name: "ToLetter", args: [-3], expected: "?" },
+
+      { id: 13, fun_name: "At", args: ["you", 2], expected: "u" },
+      { id: 13, fun_name: "At", args: ["ThisIsATest", 6], expected: "A" },
+      { id: 13, fun_name: "At", args: ["youtoo", 10], expected: "?" },
+      { id: 13, fun_name: "At", args: ["NotLongEnough", 13], expected: "?" },
+
+      { id: 14, fun_name: "SetAt", args: ["abc", 1, "B"], expected: "aBc" },
+      { id: 14, fun_name: "SetAt", args: ["acgt", 3, "u"], expected: "acgu" },
+      { id: 14, fun_name: "SetAt", args: ["dough", 0, "t"], expected: "tough" },
+
+      { id: 15, fun_name: "ToUpperL", args: ['a'], expected: "A" },
+      { id: 15, fun_name: "ToUpperL", args: ['C'], expected: "C" },
+      { id: 15, fun_name: "ToUpperL", args: ['*'], expected: "*" },
+      { id: 15, fun_name: "ToUpper", args: ["lower"], expected: "LOWER" },
+      { id: 15, fun_name: "ToUpper", args: ["UPPER"], expected: "UPPER" },
+      { id: 15, fun_name: "ToUpper", args: ["MixEd"], expected: "MIXED" },
+
+      { id: 16, fun_name: "MergeChars", args: ['a', 'x'], expected: "ax" },
+      { id: 16, fun_name: "MergeChars", args: [':', ')'], expected: ":)" },
+
+      { id: 17, fun_name: "AddPadding", args: ["OOO", 5, "x"], expected: "OOOxx" },
+      { id: 17, fun_name: "AddPadding", args: ["TooLong", 5, "&"], expected: "TooLong" },
+      { id: 17, fun_name: "AddPadding", args: ["padlots", 20, "*"], expected: "padlots*************" },
+
+      { id: 18, fun_name: "AddPadding2", args: ["OOO", 5, "x"], expected: "OOOxx" },
+      { id: 18, fun_name: "AddPadding2", args: ["TooLong", 5, "&"], expected: "TooLong" },
+      { id: 18, fun_name: "AddPadding2", args: ["padlots", 20, "*"], expected: "padlots*************" },
+
+      { id: 19, fun_name: "String2Int", args: ["47"], expected: 47 },
+      { id: 19, fun_name: "String2Int", args: ["12345987"], expected: 12345987 },
+      { id: 19, fun_name: "String2Int", args: ["-100"], expected: -100 },
+
+      { id: 20, fun_name: "Int2String", args: [47], expected: "47" },
+      { id: 20, fun_name: "Int2String", args: [12345987], expected: "12345987" },
+      { id: 20, fun_name: "Int2String", args: [-100], expected: "-100" },
+    ];
+    
+    // Summary info:
+    var test_count = testCases.length;
+    var pass_count = 0;
+    var fail_count = 0;
+    var error_count = 0;
+
+    async function UpdateSummary() {
+      const summary_div = document.getElementById('test-summary');
+      const tot_span = summary_div.querySelector('.total_count');
+      tot_span.innerHTML = `<span class="total_count">${test_count}</span>`
+      const pass_span = summary_div.querySelector('.pass_count');
+      pass_span.innerHTML = `<span class="pass_count">${pass_count}</span>`
+      const fail_span = summary_div.querySelector('.fail_count');
+      fail_span.innerHTML = `<span class="fail_count">${fail_count}</span>`
+      const error_span = summary_div.querySelector('.error_count');
+      error_span.innerHTML = `<span class="error_count">${error_count}</span>`
+    }
+
+    const results_div = document.getElementById('test-results');
+    let results_table = document.getElementById("results-table");
+
+    // Function to load and test each WASM file
+    async function runTest(test, table_row) {
+      try {
+        // Fetch the WASM file
+        const filename = "test-" + test.id.toString().padStart(2, '0') + ".wasm";
+        const response = await fetch(filename);
+        if (!response.ok) {
+          throw new Error(`Missing file ${filename}`);
+        }
+        const wasmBuffer = await response.arrayBuffer();
+        const wasmModule = await WebAssembly.instantiate(wasmBuffer);
+
+        // Check if memory exists and define memoryBuffer accordingly
+        const memoryBuffer = wasmModule.instance.exports.memory 
+            ? new Uint8Array(wasmModule.instance.exports.memory.buffer) 
+            : undefined;
+
+        // BELOW, we need to convert strings and chars to WebAssembly.  Since JavaScript doesn't treat
+        // these differently, we are going to act like any one-character string is just a char and pass
+        // it by its value.
+
+        // Call the specific function with the correct number of arguments using apply()
+        let use_args = Array.from(test.args);  // Load in the arguments for this test.
+        let arg_html = "";                   // Outputting args for user.
+        use_args.forEach((arg, index) => {     // Convert strings and chars to something WASM understands.
+          if (index > 0) arg_html += ", ";
+          arg_html += asLiteral(arg);
+          if (typeof arg === "string") {
+            if (arg.length == 1) { // We are inputting a char.
+              use_args[index] = arg.charCodeAt(0);
+            } else {
+              use_args[index] = writeStringToMemory(arg, memoryBuffer);
+            }
+          }
+        });
+
+        // Call the function to test and store the result.
+        let result = wasmModule.instance.exports[test.fun_name].apply(null, use_args);
+        let result_output = result;
+
+        // If the output is expected to be a string, read it from memory.
+        if (typeof test.expected === "string") {
+          if (test.expected.length == 1) { // We are expecting a char.
+            result = String.fromCharCode(result);
+            result_output = "'" + result + "'";
+          } else { // We are expecting a full string.
+            result = readStringFromMemory(result, memoryBuffer);
+            result_output = '"' + result + '"';
+          }
+        }
+
+        // Update the table with results.
+        let status_cell = table_row.cells[2];
+        let input_cell = table_row.insertCell(3);
+        let output_cell = table_row.insertCell(4);
+        let expected_cell = table_row.insertCell(5);
+
+        input_cell.colSpan = 1;
+        input_cell.textContent = arg_html; // `${test.args}`;
+        output_cell.textContent = `${result_output}`;
+        expected_cell.textContent = asLiteral(test.expected);
+
+        // Check the result against the expected output
+        if (result === test.expected) {
+          status_cell.textContent = "PASS";
+          status_cell.className = "result pass";
+          pass_count++;
+          UpdateSummary();
+        } else {
+          status_cell.textContent = "FAIL";
+          status_cell.className = "result fail";
+          fail_count++;
+          UpdateSummary();
+        }
+      } catch (error) {
+        // Display any error (e.g., file not found or malformed WASM)
+        let status_cell = table_row.cells[2];
+        status_cell.textContent = "ERROR";
+        status_cell.className = "result error";
+        let error_cell = table_row.insertCell(3);
+        error_cell.colSpan = 3;
+        error_cell.textContent = `ERROR: ${error.message}`;
+        error_count++;
+        UpdateSummary();
+      }
+    }
+
+    // Run tests asynchronously and show "Waiting..." until results come back
+    function runTestsAsync() {
+      testCases.forEach(test => {
+        let row = results_table.insertRow();
+        if (test.id % 2 == 0) row.classList.add("evenrow");
+        else row.classList.add("oddrow");
+
+        const filename = "test-" + test.id.toString().padStart(2, '0') + ".wasm";
+        let cell0 = row.insertCell(0);
+        cell0.textContent = filename;
+
+        let cell1 = row.insertCell(1);
+        cell1.textContent = test.fun_name;
+
+        let cell2 = row.insertCell(2);
+        cell2.textContent = 'Waiting...'
+        cell2.className = "result waiting";
+
+        // Run the test asynchronously
+        runTest(test, row);
+      });
+    }
+
+    // Start the asynchronous tests
+    runTestsAsync();
+  </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+// Index values must be type int.
+function ErrorFun(string x) : char {
+  return x["here"];
+}

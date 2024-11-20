@@ -1,0 +1,2 @@
+// Make sure type DOUBLE also works.
+function EchoD(double x) : double { return x; }

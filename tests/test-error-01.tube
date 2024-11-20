@@ -1,0 +1,7 @@
+// Cannot call a function that does not exist.
+function Add(int val1, int val2) : int {
+  return val1 + val2;
+}
+function ErrorFun(int val1, int val2) : int {
+  return Add2(val1, val2);
+}

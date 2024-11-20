@@ -1,0 +1,2 @@
+// Functions must have a name.
+function (int x) : int { return x; }

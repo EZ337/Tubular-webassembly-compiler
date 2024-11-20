@@ -1,0 +1,4 @@
+// Cannot add a string to an int.
+function ErrorFun(int x) : int {
+  return x + "ahhh!";
+}

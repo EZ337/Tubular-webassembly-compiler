@@ -1,0 +1,6 @@
+// Dynamic Indexing
+function ToLetter(int x) : char {
+  if (x < 0 || x >= 26) return '?';
+  string s = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return s[x];
+}

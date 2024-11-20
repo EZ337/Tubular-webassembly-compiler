@@ -1,0 +1,15 @@
+// Convert a string to all UPPERCASE
+function ToUpperL(char l) : char {
+  if (l >= 'a' && l <= 'z') {
+    return l - 'a' + 'A';
+  }
+  return l;
+}
+function ToUpper(string str) : string {
+  int index = 0;
+  while (index < size(str)) {
+    str[index] = ToUpperL(str[index]);
+    index = index + 1;
+  }
+  return str;
+}

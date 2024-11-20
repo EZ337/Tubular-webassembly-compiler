@@ -1,0 +1,4 @@
+// Cannot run size() with no arguments.
+function ErrorFun() : int {
+  return size();
+}

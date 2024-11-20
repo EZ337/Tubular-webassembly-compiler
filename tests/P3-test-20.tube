@@ -1,0 +1,14 @@
+// Test if a value is prime.
+function IsPrime(int value) : int {
+  int is_prime = 1;
+  // We only need to test divisors up to square root, so stop there.
+  int test_cap = sqrt(value):int;
+  int test_val = 2;
+  while (is_prime && test_val <= test_cap) {
+    if (value % test_val == 0) {
+      is_prime = 0;
+    }
+    test_val = test_val + 1;
+  }
+  return is_prime;
+}

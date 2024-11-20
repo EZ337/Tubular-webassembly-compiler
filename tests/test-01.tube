@@ -1,0 +1,7 @@
+// Test calling one simple function from another.
+function Add (int val1, int val2) : int {
+  return val1 + val2;
+}
+function Add3(int val1, int val2, int val3) : int {
+  return Add(val1, val2) + val3;
+}

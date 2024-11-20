@@ -1,0 +1,7 @@
+// Chained assignments
+function Triple(double val) : double {
+  double x = 0;
+  double y;
+  double z = x = y = val;
+  return x + y + z;
+}

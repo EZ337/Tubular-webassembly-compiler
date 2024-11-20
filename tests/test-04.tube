@@ -1,0 +1,5 @@
+// You should be able to follow a function call with a type modifier.
+function PI() : double { return 3.14159265358979; }
+function Get3() : int {
+  return PI():int;
+}

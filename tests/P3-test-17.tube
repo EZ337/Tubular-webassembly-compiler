@@ -1,0 +1,4 @@
+// Do we have an upper case letter?
+function IsUpper(char c) : int {
+  return c >= 'A' && c <= 'Z';
+}

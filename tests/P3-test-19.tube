@@ -1,0 +1,5 @@
+// Test conversion from double to int and back.
+function Floor(double val) : double {
+  int floored = val:int;
+  return floored:double;
+}
