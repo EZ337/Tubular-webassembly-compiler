@@ -941,8 +941,8 @@ public:
   
   
   bool ToWAT(Control & control) override {
-    control.Code("(i32.load ", pos, ')')
-      .Comment("Load the first position of ", str, " literal");
+    control.Code("(i32.const ", pos, ")")
+      .Comment("Load the first position (", str[0], ")");
     return true;
   }
 

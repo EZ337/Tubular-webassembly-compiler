@@ -389,7 +389,7 @@ public:
     control.Indent(2);
 
     // Manage DATA
-    control.CommentLine(";; Define a memory block with ten pages (640KB)");
+    control.CommentLine(";; Define a memory block with ten pages (64KB)");
     control.Code("(memory (export \"memory\") 1)");
     for (auto & fun_ptr : functions) {
       fun_ptr->InitializeWAT(control);
