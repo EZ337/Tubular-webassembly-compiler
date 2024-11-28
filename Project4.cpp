@@ -133,6 +133,11 @@ public:
       tokens.Use(')');
       out = MakeNode<ASTNode_Math1>(token, std::move(out));
       break;
+    
+    case emplex::Lexer::ID_LIT_STRING:
+      out = MakeNode<ASTNode_StringLit>(token);
+      break;
+
     default:
       Error(token, "Unexpected token '", token.lexeme, "'");
     }

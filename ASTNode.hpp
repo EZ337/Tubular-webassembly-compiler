@@ -918,3 +918,32 @@ public:
   }
 
 };
+
+class ASTNode_StringLit : public ASTNode {
+  std::string str;
+  size_t pos;
+
+public:
+
+  ASTNode_StringLit(emplex::Token token) : ASTNode(token), str(token.lexeme) {
+    ReplaceAll(str, "\"", "");
+  }
+
+  std::string GetTypeName() const override { return "STRING_LIT"; }
+
+  Type ReturnType(const SymbolTable&) const override {
+    return Type("string");
+  }
+
+  void InitializeWAT(Control & control) override {
+    pos = control.Data(str);
+  }
+  
+  
+  bool ToWAT(Control & control) override {
+    control.Code("(i32.load ", pos, ')')
+      .Comment("Load the first position of ", str, " literal");
+    return true;
+  }
+
+};
