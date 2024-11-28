@@ -114,13 +114,9 @@ public:
       if (!control.symbols.Has(token.lexeme)) {
         Error(token, "Unknown variable '", token.lexeme, "'.");
       }
-      if (tokens.Is('(')) {
-        out = Parse_Function_Call(token);
-      }
-      else
-      {
-        out = MakeVarNode(token);
-      }
+
+      // Is it a function call or just a regular variable
+      out = (tokens.Is('(')) ? Parse_Function_Call(token) : MakeVarNode(token);
       break;
     case emplex::Lexer::ID_LIT_INT:
       out = MakeNode<ASTNode_IntLit>(token, std::stoi(token.lexeme));
@@ -294,7 +290,7 @@ public:
     return out_node;
   }
 
-ast_ptr_t Parse_Function_Call(emplex::Token fun_token) {
+  ast_ptr_t Parse_Function_Call(emplex::Token fun_token) {
   // At this point, fun_token is the token containing the function name
   
   tokens.Use(); // Use the '(' token initiating a function call
