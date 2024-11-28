@@ -307,6 +307,11 @@ ast_ptr_t Parse_Function_Call(emplex::Token fun_token) {
     Error(fun_token, fun_token.lexeme, " cannot be used as a function");
   }
 
+  // std::string str = ToString("function information:\nFunction id: ", fun_id, "\n Function name: ",
+  //   fun_token.lexeme, "\nFunction return type: ", fun_type.ReturnType().ToWAT());
+
+  // std::cout << str << std::endl;
+
   auto fun_call = MakeNode<ASTNode_Function_Call>(fun_token, fun_id);
 
   for (size_t i = 0; i < fun_type.NumParams(); ++i) {
@@ -440,6 +445,7 @@ int main(int argc, char * argv[])
   prog.ToWAT();
   // std::cout << "---------" << std::endl;
   // prog.PrintSymbols();
+  // prog.PrintAST();
 
   std::ofstream os("ez.wat");
   prog.PrintCode((std::string(argv[1]) == "ez_test") ? os : std::cout);

@@ -247,50 +247,6 @@ public:
   }
 };
 
-class ASTNode_Function_Call : public ASTNode_Parent {
-  emplex::Token fun_token;
-  size_t fun_id;
-
-
-public:
-  
-  ASTNode_Function_Call(emplex::Token fun_info, size_t fun_id)
-    : ASTNode_Parent(fun_info), fun_token(fun_info), fun_id(fun_id) {}
-
-  // Function call guarantees a return. 
-  // Might not terminate owning function though
-  bool MayReturn() const override { return true; }
-
-  std::string GetTypeName() const override {
-    return "Function Call";
-  }
-
-  bool ToWAT(Control& control) {
-    control.CommentLine("Function call setup");
-    
-    Type fun_type = control.symbols.GetType(fun_id);
-
-    for (size_t i = 0; i < NumChildren(); ++i) {
-      // Error check that the correct type was passed into the function
-      if (GetChild(i).ReturnType(control.symbols) != fun_type.ParamType(i)) {
-        Error(fun_token, "Invalid type for param", i);
-      }
-
-      // Put the argument on the stack for use
-      ChildToWAT(i, control, true);
-    }
-
-    control.Code("(call $", fun_token.lexeme, ")")
-      .Comment("Call the function");
-
-    return true;  // Function calls always return a value
-  }
-
-  Type ReturnType(const SymbolTable & symbols) const override {
-    return symbols.At(fun_id).type;
-  }
-
-};
 
 class ASTNode_If : public ASTNode_Parent {
 public:
@@ -918,3 +874,47 @@ public:
 
 };
 
+class ASTNode_Function_Call : public ASTNode_Parent {
+  emplex::Token fun_token;
+  size_t fun_id;
+
+
+public:
+  
+  ASTNode_Function_Call(emplex::Token fun_info, size_t fun_id)
+    : ASTNode_Parent(fun_info), fun_token(fun_info), fun_id(fun_id) {}
+
+  // Function call guarantees a return. 
+  // Might not terminate owning function though
+  bool MayReturn() const override { return true; }
+
+  std::string GetTypeName() const override {
+    return "Function Call";
+  }
+
+  bool ToWAT(Control& control) {
+    control.CommentLine("Function call setup");
+    
+    Type fun_type = control.symbols.GetType(fun_id);
+
+    for (size_t i = 0; i < NumChildren(); ++i) {
+      // Error check that the correct type was passed into the function
+      if (GetChild(i).ReturnType(control.symbols) != fun_type.ParamType(i)) {
+        Error(fun_token, "Invalid type for param", i);
+      }
+
+      // Put the argument on the stack for use
+      ChildToWAT(i, control, true);
+    }
+
+    control.Code("(call $", fun_token.lexeme, ")")
+      .Comment("Call the function");
+
+    return true;  // Function calls always return a value
+  }
+
+  Type ReturnType(const SymbolTable & symbols) const override {
+    return symbols.GetType(fun_id).ReturnType();
+  }
+
+};
