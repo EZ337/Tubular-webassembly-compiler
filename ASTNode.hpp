@@ -171,6 +171,12 @@ public:
     ASTNode_Parent::AddChild(std::move(child));
   }
 
+  bool IsReturn() const override { return is_return; }
+  bool MayReturn() const override { return may_return; }
+  Type ReturnType(const SymbolTable & symbols) const override {
+    return LastChild().ReturnType(symbols);
+  }
+
   bool ToWAT(Control & control) override { 
     bool is_final_node = control.FinalNode();
     control.FinalNode(false);

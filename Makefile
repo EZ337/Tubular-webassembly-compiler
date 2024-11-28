@@ -2,7 +2,7 @@
 PROJECT := Project4
 
 # Identify compiler to use
-CXX := clang++
+CXX := g++
 
 # Flags to ALWAYs use
 CFLAGS_all := -Wall -Wextra -std=c++20
