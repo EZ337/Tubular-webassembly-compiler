@@ -10,6 +10,7 @@
 struct Control {
   SymbolTable symbols{};
   int indent = 0;
+  bool final_node = false;  // Are we processing the final (right-most) node in a function?
   size_t wat_mem_pos = 0;   // Position for generating fixed data in WAT memory.
 
   std::vector<std::string> break_stack; // Stack of break labels for active scopes.
@@ -26,12 +27,17 @@ struct Control {
   std::vector<WAT_Line> code;
 
 public:  // Member functions.
+
+  bool FinalNode() const { return final_node; }
+  void FinalNode(bool in) { final_node = in; }
+
   // Change the amount of indent used.
   Control &  Indent(int diff) {
     indent += diff;
     return *this;
   }
 
+  // Provide code that should be printed.
   template <typename... Ts>
   Control & Code(Ts &&... args) {
     std::stringstream ss;
@@ -75,6 +81,7 @@ public:  // Member functions.
     return Comment(std::forward<Ts>(args)...);
   }
 
+  // Generate code to the provided output stream (cout by default)
   void PrintCode(std::ostream & os=std::cout) const {
     // First, process code to identify the widest line with a comment.
     size_t max_width = 0;
