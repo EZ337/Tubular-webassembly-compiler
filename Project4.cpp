@@ -114,7 +114,13 @@ public:
       if (!control.symbols.Has(token.lexeme)) {
         Error(token, "Unknown variable '", token.lexeme, "'.");
       }
-      out = MakeVarNode(token);
+      if (tokens.Is('(')) {
+        out = Parse_Function_Call(token);
+      }
+      else
+      {
+        out = MakeVarNode(token);
+      }
       break;
     case emplex::Lexer::ID_LIT_INT:
       out = MakeNode<ASTNode_IntLit>(token, std::stoi(token.lexeme));
@@ -288,6 +294,37 @@ public:
     return out_node;
   }
 
+ast_ptr_t Parse_Function_Call(emplex::Token fun_token) {
+  // At this point, fun_token is the token containing the function name
+  
+  tokens.Use(); // Use the '(' token initiating a function call
+
+  size_t fun_id = control.symbols.GetVarID(fun_token.lexeme);
+  Type fun_type = control.symbols.GetType(fun_id);
+
+  if (!fun_type.IsFunction()) // treated a variable as if it's a function
+  {
+    Error(fun_token, fun_token.lexeme, " cannot be used as a function");
+  }
+
+  auto fun_call = MakeNode<ASTNode_Function_Call>(fun_token, fun_id);
+
+  for (size_t i = 0; i < fun_type.NumParams(); ++i) {
+    //ast_ptr_t arg = Parse_Statement_Expression();
+    auto arg = Parse_Expression();  // Can be inlined. Just for debugging rn
+    
+    // Type mismatch check can happen here. Might just do it in TypeCheck
+    fun_call.get()->AddChild(std::move(arg));
+    if (!tokens.UseIf(',')) {
+      break;  // Break if we don't separate
+    }
+  }
+
+  tokens.Use(')'); // Expecting an end of function call
+
+  return fun_call;
+}
+
   // A function has the format:
   //    function ID ( PARAMETERS ) : TYPE { STATEMENT_BLOCK }
   //    The initial ID is the function name.
@@ -337,7 +374,7 @@ public:
     // Outer layer can only be function definitions.
     while (tokens.Any()) {
       functions.push_back( Parse_Function() );
-      functions.back()->TypeCheck(control.symbols);
+      // functions.back()->TypeCheck(control.symbols);
     }
   }
 
