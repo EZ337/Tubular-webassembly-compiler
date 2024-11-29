@@ -34,4 +34,4 @@
 *.wasm
 .vscode
 Project4
-ez*
+experiments/

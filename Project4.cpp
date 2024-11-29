@@ -452,7 +452,7 @@ int main(int argc, char * argv[])
   // prog.PrintSymbols();
   // prog.PrintAST();
 
-  std::ofstream os("ez.wat");
-  prog.PrintCode((std::string(argv[1]) == "ez_test") ? os : std::cout);
+  std::ofstream os("experiments/ez.wat");
+  prog.PrintCode((std::string(argv[1]) == "experiments/ez_test") ? os : std::cout);
   os.close();
 }

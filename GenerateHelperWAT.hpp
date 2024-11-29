@@ -5,8 +5,8 @@ void GenerateSizeFunction(Control& control)
 {
     int indent = control.indent, original = control.indent;
 
-    emplex::Token size_function{emplex::Lexer::ID_SIZE, "size", 0,0};
-    control.symbols.AddFunction(size_function, {Type("string")}, Type("int"));
+    // emplex::Token size_function{emplex::Lexer::ID_SIZE, "size", 0,0};
+    // control.symbols.AddFunction(size_function, {Type("string")}, Type("int"));
 
     control.CommentLine("Function to get the size of a string")
         .Code("(func $size (param $str i32) (result i32)")
@@ -48,6 +48,9 @@ void GenerateSizeFunction(Control& control)
         .Indent(-2)
         .Code(")").CommentLine("");
     
-    assert(original == indent);
     control.indent = original;  // Set it back to it's originl just for good measure
+    
+    control.Code("(export \"size\" (func $size))")
+        .CommentLine("");
+
 }
