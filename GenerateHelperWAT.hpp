@@ -14,6 +14,7 @@ void GenerateSizeFunction(Control& control)
         .CommentLine("Variables")
         .Code("(local $len i32)")
         .Code("(local $i i32)")
+        .CommentLine("")
         .CommentLine("Begin code")
         .Code("(local.set $len (i32.const 0))")
         .Comment("Set len to 0")
@@ -53,4 +54,9 @@ void GenerateSizeFunction(Control& control)
     control.Code("(export \"size\" (func $size))")
         .CommentLine("");
 
+}
+
+void GenerateStrConcat(const ASTNode& child1, const ASTNode& child2)
+{
+    
 }

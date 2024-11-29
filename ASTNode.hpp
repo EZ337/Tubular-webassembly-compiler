@@ -743,6 +743,30 @@ public:
     }
   }
 
+  void ToWAT_String(Control& control)
+  {
+    auto const& symbols = control.symbols;
+
+    if (op == "+")  // Expect only char or string
+    {
+      if (GetChild(1).ReturnType(symbols).IsString()) // String concat
+      {
+        control.CommentLine("Setup String concatenation");
+        // Tell child0 to put it's size on the stack
+        ChildToWAT(0, control, true);
+        // Call size to get the size of child 0
+        control.Code("(call $size)").Comment("leave size1 on stack");
+        ChildToWAT(1, control, true);
+        control.Code("(call $size)").Comment("leave size2 on stack ")
+          .Code("(i32.add)").Comment("Add sizes")
+          .Code("(i32.const 1)").Comment("Add a 1 to the stack")
+          .Code("(i32.add)").Comment("Add the 1 for the null term")
+          .CommentLine("Now allocate space for the new str")
+          .Code("(call $_alloc_str)");
+      }
+    }
+  }
+
   bool ToWAT(Control & control) override {
     assert(NumChildren() == 2);
 
@@ -750,6 +774,13 @@ public:
     if (op == "=") { ToWAT_Assign(control); return true; }
     if (op == "&&") { ToWAT_AND(control); return true; }
     if (op == "||") { ToWAT_OR(control); return true; }
+
+    // String math op
+    if (GetChild(0).ReturnType(control.symbols).IsString())
+    {
+      ToWAT_String(control);
+      return true;
+    }
 
     ChildToWAT(0, control, true); // Calculate the first arg (so it's top of the stack)
     ChildToWAT(1, control, true); // Calculate the second arg (so it's one down on the stack)
