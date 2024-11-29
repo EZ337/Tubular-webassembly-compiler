@@ -414,6 +414,9 @@ public:
 
     // Generate the size function
     GenerateSizeFunction(control);
+    GenerateStrCpy(control);
+    // Generate the str_concat function
+    GenerateStrConcat(control);
 
     for (auto & fun_ptr : functions) {
       fun_ptr->ToWAT(control);
