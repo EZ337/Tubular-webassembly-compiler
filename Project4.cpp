@@ -10,6 +10,7 @@
 #include "lexer.hpp"
 #include "SymbolTable.hpp"
 #include "TokenQueue.hpp"
+#include "GenerateHelperWAT.hpp"
 
 class Tubular {
 private:
@@ -410,6 +411,9 @@ public:
            .Code("  (global.set $free_mem)").Comment("Update free memory start.")
            .Code(")")
            .Code("");
+
+    // Generate the size function
+    GenerateSizeFunction(control);
 
     for (auto & fun_ptr : functions) {
       fun_ptr->ToWAT(control);
