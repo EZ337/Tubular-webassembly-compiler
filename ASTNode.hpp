@@ -513,7 +513,7 @@ public:
     assert(NumChildren() == 1);
     ChildToWAT(0, control, true);
     if (GetChild(0).ReturnType(control.symbols).IsChar()) {
-      control.Code("(insert char to string code)").Comment("Convert to string.");
+      control.Code("(call $_char_to_string)").Comment("Convert to string.");
     }
     return true;
   }

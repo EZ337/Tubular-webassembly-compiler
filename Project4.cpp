@@ -434,6 +434,7 @@ public:
     GenerateStrCpy(control);
     // Generate the str_concat function
     GenerateStrConcat(control);
+    GenerateCharToString(control);
 
     for (auto & fun_ptr : functions) {
       fun_ptr->ToWAT(control);
@@ -472,7 +473,16 @@ int main(int argc, char * argv[])
   // prog.PrintSymbols();
   // prog.PrintAST();
 
-  std::ofstream os("experiments/ez.wat");
-  prog.PrintCode((std::string(argv[1]) == "experiments/ez_test") ? os : std::cout);
-  os.close();
+  if (std::string(argv[1]) == std::string("experiments/ez_test"))
+  {
+    std::ofstream os("experiments/ez.wat");
+    prog.PrintCode(os);
+    os.close();
+    std::system("cd experiments && wat2wasm ez.wat");
+  }
+  else
+  {
+    prog.PrintCode();
+  }
+  
 }

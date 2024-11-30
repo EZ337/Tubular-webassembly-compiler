@@ -39,7 +39,9 @@ void GenerateFunctionHeader(Control& control, std::string func_name, std::string
     va_end(args);
 
     // Output the result string
-    control.Code(resultString.str());
+    control.Code(resultString.str())
+        .Indent(2)
+        .CommentLine("Variables");
 }
 
 void GenerateSizeFunction(Control& control)
@@ -101,9 +103,7 @@ void GenerateStrCpy(Control& control)
 {
     GenerateFunctionHeader(control, "_strcpy", "", "str i32", "dest i32", "amount i32", nullptr);
     
-    control.Indent(2)
-        .CommentLine("Variables")
-        .Code("(local $i i32)")
+    control.Code("(local $i i32)")
         .CommentLine().CommentLine("Begin Code")
 
         // Function body
@@ -143,9 +143,7 @@ void GenerateStrConcat(Control& control)
 
     GenerateFunctionHeader(control, "_str_concat", "i32", "str1 i32", "str2 i32", nullptr);
 
-    control.Indent(2)
-        .CommentLine("Variables")
-        .Code("(local $size1 i32)").Comment("str1.size")
+        control.Code("(local $size1 i32)").Comment("str1.size")
         .Code("(local $size2 i32)").Comment("str2.size")
         .Code("(local $newPos i32)").Comment("location of concatenated string")
         .CommentLine("")
@@ -184,3 +182,18 @@ void GenerateStrConcat(Control& control)
     // control.Code("(export \"Concat\" (func $_str_concat))");
     control.CommentLine("");
 };
+
+void GenerateCharToString(Control& control)
+{
+    GenerateFunctionHeader(control, "_char_to_string", "i32", "char i32", nullptr);
+
+    control.Code("(local $pos i32)").Comment("The position of the allocated char")
+        .CommentLine().CommentLine("Begin Code")
+        .Code("(call $_alloc_str (i32.const 2))").Comment("one for char, one for nullterm")
+        .Code("(local.set $pos)").Comment("Sets pos to the allocated str for return")
+        .Code("(local.get $pos)").Comment("gets the position to store.")
+        .Code("(i32.store8 (local.get $pos) (local.get $char))").Comment("store $char at pos")
+        
+        .CommentLine("pos is already on the stack so return")
+        .Indent(-2).Code(')').CommentLine();
+}
