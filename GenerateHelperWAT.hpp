@@ -100,7 +100,7 @@ void GenerateSizeFunction(Control& control)
 void GenerateStrCpy(Control& control)
 {
     GenerateFunctionHeader(control, "_strcpy", "", "str i32", "dest i32", "amount i32", nullptr);
-
+    
     control.Indent(2)
         .CommentLine("Variables")
         .Code("(local $i i32)")
