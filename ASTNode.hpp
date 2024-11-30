@@ -752,19 +752,15 @@ public:
       if (GetChild(1).ReturnType(symbols).IsString()) // String concat
       {
         control.CommentLine("Setup String concatenation");
-        // Tell child0 to put it's size on the stack
+        // Tell children to put themselves the stack
         ChildToWAT(0, control, true);
-        // Call size to get the size of child 0
-        control.Code("(call $size)").Comment("leave size1 on stack");
         ChildToWAT(1, control, true);
-        control.Code("(call $size)").Comment("leave size2 on stack ")
-          .Code("(i32.add)").Comment("Add sizes")
-          .Code("(i32.const 1)").Comment("Add a 1 to the stack")
-          .Code("(i32.add)").Comment("Add the 1 for the null term")
-          .CommentLine("Now allocate space for the new str")
-          .Code("(call $_alloc_str)");
+        control.Code("(call $_str_concat)")
+        .Comment("concat new strings and return the newPosition");
       }
+
     }
+
   }
 
   bool ToWAT(Control & control) override {
