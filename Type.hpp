@@ -29,6 +29,7 @@ private:
 
     // Specialty types
     bool IsNumeric() const { return IsChar() || IsInt() || IsDouble(); }
+    bool IsAlpha() const {return IsChar() || IsString(); }
 
     virtual std::string Name() const { return "void"; }
     virtual std::string ToWAT() const { return "UNKNOWN_TYPE"; }
@@ -83,6 +84,7 @@ public:
   bool IsFunction() const {return info_ptr && Info().IsFunction(); }
   bool IsBase() const { return info_ptr && Info().IsBase(); }
   bool IsNumeric() const { return info_ptr && Info().IsNumeric(); }
+  bool IsAlpha() const { return info_ptr && Info().IsAlpha(); }
 
   bool IsSame(const Type & in) const { return Info().IsSame(*in.info_ptr); }
   bool operator==(const Type & in) const { return IsSame(in); }

@@ -67,6 +67,11 @@ private:
     return node_ptr;
   }
 
+  ast_ptr_t PromoteToString (ast_ptr_t && node_ptr) 
+  {
+    return MakeNode<ASTNode_ToString>(std::move(node_ptr));
+  }
+
   void SetupOperators() {
     // Setup operator precedence.
     size_t cur_prec = 0;
@@ -187,6 +192,18 @@ public:
 
       // Load the next term.
       ast_ptr_t node2 = Parse_Expression(next_limit);
+
+      auto node1Type = cur_node.get()->ReturnType(control.symbols);
+      auto node2Type = node2.get()->ReturnType(control.symbols);
+
+      if (node1Type.IsString() && node2Type.IsChar())
+      {
+        node2 = PromoteToString(std::move(node2));
+      }
+      else if (node1Type.IsChar() && node2Type.IsString())
+      {
+        cur_node = PromoteToString(std::move(cur_node));
+      }
 
       // Build the new node.
       cur_node = MakeNode<ASTNode_Math2>(op_token, std::move(cur_node), std::move(node2));

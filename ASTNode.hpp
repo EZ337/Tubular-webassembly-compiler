@@ -492,6 +492,33 @@ public:
   }
 };
 
+class ASTNode_ToString : public ASTNode_Parent {
+public:
+  ASTNode_ToString(ptr_t && child) : ASTNode_Parent(child->GetFilePos(), child) { }
+  std::string GetTypeName() const override { return "ToString"; }
+  Type ReturnType(const SymbolTable &) const override { return Type("string"); }
+
+  void TypeCheck(const SymbolTable & symbols) override {
+    if (NumChildren() != 1) {
+      Error(file_pos, "Internal error: Expected child in ToString node, found ", NumChildren());
+    }
+    TypeCheckChildren(symbols);
+    const Type & child_type = GetChild(0).ReturnType(symbols);
+    if (!child_type.CastToOK(Type("string"))) {
+      Error(file_pos, "Cannot convert type ", child_type.Name(), " to string.");
+    }
+  }
+
+  bool ToWAT(Control & control) override {
+    assert(NumChildren() == 1);
+    ChildToWAT(0, control, true);
+    if (GetChild(0).ReturnType(control.symbols).IsChar()) {
+      control.Code("(insert char to string code)").Comment("Convert to string.");
+    }
+    return true;
+  }
+};
+
 
 class ASTNode_Math1 : public ASTNode_Parent {
 protected:
@@ -741,15 +768,21 @@ public:
       // Standard mathematical addition.
       control.Code("(", type.ToWAT(), ".add)").Comment("Stack2 + Stack1");
     }
+    else if (type.IsString())
+    {
+      control.Code("(call $_str_concat)")
+        .Comment("concat new strings and return the newPosition");
+    }
   }
 
+  /* For keepsake
   void ToWAT_String(Control& control)
   {
     auto const& symbols = control.symbols;
 
     if (op == "+")  // Expect only char or string
     {
-      if (GetChild(1).ReturnType(symbols).IsString()) // String concat
+      if (GetChild(1).ReturnType(symbols).IsAlpha()) // String concat
       {
         control.CommentLine("Setup String concatenation");
         // Tell children to put themselves the stack
@@ -762,6 +795,7 @@ public:
     }
 
   }
+  */
 
   bool ToWAT(Control & control) override {
     assert(NumChildren() == 2);
@@ -770,13 +804,6 @@ public:
     if (op == "=") { ToWAT_Assign(control); return true; }
     if (op == "&&") { ToWAT_AND(control); return true; }
     if (op == "||") { ToWAT_OR(control); return true; }
-
-    // String math op
-    if (GetChild(0).ReturnType(control.symbols).IsString())
-    {
-      ToWAT_String(control);
-      return true;
-    }
 
     ChildToWAT(0, control, true); // Calculate the first arg (so it's top of the stack)
     ChildToWAT(1, control, true); // Calculate the second arg (so it's one down on the stack)
@@ -969,7 +996,7 @@ public:
   
   bool ToWAT(Control & control) override {
     control.Code("(i32.const ", pos, ")")
-      .Comment("Load the first position (", str[0], ")");
+      .Comment("put the starting address of ", str, " on stack");
     return true;
   }
 
