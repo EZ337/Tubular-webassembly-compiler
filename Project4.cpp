@@ -155,6 +155,7 @@ public:
       auto type_token = tokens.Use(emplex::Lexer::ID_TYPE, "Expected a type specified after ':'.");
       if (type_token.lexeme == "double") out = MakeNode<ASTNode_ToDouble>(std::move(out));
       else if (type_token.lexeme == "int") out = MakeNode<ASTNode_ToInt>(std::move(out));
+      else if (type_token.lexeme == "string") out = MakeNode<ASTNode_ToString>(std::move(out));
     }
 
     return out;
