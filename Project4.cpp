@@ -122,7 +122,7 @@ public:
       }
 
       // Is it a function call or just a regular variable
-      out = (tokens.Is('(')) ? Parse_Function_Call(token) : MakeVarNode(token);
+      out = Parse_ID_Expression(token);
       break;
     case emplex::Lexer::ID_LIT_INT:
       out = MakeNode<ASTNode_IntLit>(token, std::stoi(token.lexeme));
@@ -351,6 +351,23 @@ public:
 
   return fun_call;
 }
+
+  ast_ptr_t Parse_ID_Expression(emplex::Token token) 
+  {
+
+    if (tokens.Is('(')) {return Parse_Function_Call(token); }
+    auto varNode =  MakeVarNode(token);
+
+    if (tokens.UseIf('[')) {
+      // Typecheck in typecheck
+      ast_ptr_t index = Parse_Expression();
+      tokens.Use(']');
+
+      return MakeNode<ASTNode_Index>(std::move(varNode), std::move(index));
+    }
+
+    return varNode;
+  }
 
   ast_ptr_t Parse_Statement_Size()
   {

@@ -1019,3 +1019,43 @@ public:
   }
 
 };
+
+class ASTNode_Index : public ASTNode_Parent {
+public:
+  ASTNode_Index(ptr_t && child, ptr_t index) : ASTNode_Parent(child->GetFilePos(), child, index) { }
+
+  std::string GetTypeName() const override { return "Index"; }
+
+  Type ReturnType(const SymbolTable & symbols) const override {
+    auto child_type = GetChild(0).ReturnType(symbols);
+    if (child_type.IsString()) {return Type("char"); }
+
+    // You need to support that type
+    Error(file_pos, "Unsupported indexable type");
+  }
+
+  void TypeCheck(const SymbolTable & symbols) override {
+    if (NumChildren() != 2) {
+      Error(file_pos, "Internal error: Expected two children in Index node, found ", NumChildren());
+    }
+    TypeCheckChildren(symbols);
+    const Type & var_type = GetChild(0).ReturnType(symbols);
+    const Type & index_type = GetChild(1).ReturnType(symbols);
+    if (!var_type.IsIndexable()) {  // Maybe check that it's a variable?
+      Error(file_pos, var_type.Name(), " is not indexable");
+    }
+    if (!index_type.IsInt()){
+      Error(file_pos, "Expected int type for operator [], got ", index_type.ReturnType().Name());
+    }
+  }
+
+  bool ToWAT(Control & control) override {
+    assert(NumChildren() == 2);
+    control.CommentLine("Setup index operation");
+    ChildToWAT(0, control, true); // Put the variable's memory address on the stack
+    ChildToWAT(1, control, true); // Put the index number on the stack
+    control.Code("(i32.add)").Comment("Offset initial memory address")
+      .Code("(i32.load8_u)").Comment("now load the item");
+    return true;
+  }
+};
