@@ -117,8 +117,9 @@ void GenerateStrCpy(Control& control)
         .Code("(br_if $exit_while)").Comment("break if i >= amount")
 
         .CommentLine("While body")
-        .Code("(i32.add (local.get $str) (local.get $i))").Comment("get char in str")
         .Code("(i32.add (local.get $dest) (local.get $i))").Comment("get the dest location")
+        .Code("(i32.add (local.get $str) (local.get $i))").Comment("get addr of str[i]")
+        .Code("(i32.load8_u)").Comment("Dereference str[i]")
         .Code("(i32.store8)").Comment("Store")
 
         .CommentLine()
