@@ -197,6 +197,7 @@ public:
       auto node1Type = cur_node.get()->ReturnType(control.symbols);
       auto node2Type = node2.get()->ReturnType(control.symbols);
 
+      /*
       if (node1Type.IsString() && node2Type.IsChar())
       {
         node2 = PromoteToString(std::move(node2));
@@ -204,7 +205,7 @@ public:
       else if (node1Type.IsChar() && node2Type.IsString())
       {
         cur_node = PromoteToString(std::move(cur_node));
-      }
+      } */
 
       // Build the new node.
       cur_node = MakeNode<ASTNode_Math2>(op_token, std::move(cur_node), std::move(node2));
@@ -226,6 +227,7 @@ public:
       case Lexer::ID_RETURN: return Parse_Statement_Return();
       case Lexer::ID_BREAK:  return Parse_Statement_Break();
       case Lexer::ID_CONTINUE: return Parse_Statement_Continue();
+      case Lexer::ID_SIZE: return Parse_Statement_Size();
       case '{': return Parse_StatementList();
       case ';':
         tokens.Use();
@@ -350,6 +352,12 @@ public:
   return fun_call;
 }
 
+  ast_ptr_t Parse_Statement_Size()
+  {
+    auto token = tokens.Use(emplex::Lexer::ID_SIZE);
+    
+  }
+
   // A function has the format:
   //    function ID ( PARAMETERS ) : TYPE { STATEMENT_BLOCK }
   //    The initial ID is the function name.
@@ -399,7 +407,7 @@ public:
     // Outer layer can only be function definitions.
     while (tokens.Any()) {
       functions.push_back( Parse_Function() );
-      // functions.back()->TypeCheck(control.symbols);
+      functions.back()->TypeCheck(control.symbols);
     }
   }
 

@@ -636,12 +636,14 @@ public:
     // Conduct tests based on the type of operator:
     enum Status { INVALID, OK,
                   PROMOTE0_INT, PROMOTE0_DOUBLE,
-                  PROMOTE1_INT, PROMOTE1_DOUBLE };
+                  PROMOTE1_INT, PROMOTE1_DOUBLE,
+                  PROMOTE0_STRING, PROMOTE1_STRING };
     Status status = INVALID;
     bool align_numeric = false;
     if (op == "*") {
       if ((type0.IsInt()    && type1.IsInt()) ||
-          (type0.IsDouble() && type1.IsDouble())) {
+          (type0.IsDouble() && type1.IsDouble()) ||
+          (type0.IsAlpha() && type1.IsInt())) {
         status = OK;
       }
       else if (type0.IsInt() && type1.IsDouble()) status = PROMOTE0_DOUBLE;
@@ -670,6 +672,7 @@ public:
       // Otherwise see about promote RHS only.
       else if (type0.IsDouble() && type1.IsNumeric()) status = PROMOTE1_DOUBLE;
       else if (type0.IsInt() && type1.IsChar())       status = PROMOTE1_INT;
+      else if (type0.IsString() && type1.IsAlpha())     status = PROMOTE1_STRING;
     }
     else {
       // Internal error
@@ -685,13 +688,25 @@ public:
       else if (type0.IsInt())    status = PROMOTE1_INT;
     }
 
+    // If we are adding characters or strings
+    if (op == "+" && type0.IsAlpha()) {
+      if (type0 == type1)
+        status = OK;
+      else if (type0.IsString() && type1.IsChar())
+        status = PROMOTE1_STRING;
+      else if (type0.IsChar() && type1.IsString())
+        status = PROMOTE0_STRING;
+    }
+
     if constexpr (DEBUG) {
       // Print the current status.
       switch (status) {
       case PROMOTE0_INT:    std::cerr << "...Promoting 0 to INT"    << std::endl;  break;
       case PROMOTE0_DOUBLE: std::cerr << "...Promoting 0 to DOUBLE" << std::endl;  break;
+      case PROMOTE0_STRING: std::cerr << "...Promoting 0 to String" << std::endl;  break;
       case PROMOTE1_INT:    std::cerr << "...Promoting 1 to INT"    << std::endl;  break;
       case PROMOTE1_DOUBLE: std::cerr << "...Promoting 1 to DOUBLE" << std::endl;  break;
+      case PROMOTE1_STRING: std::cerr << "...Promoting 1 to String" << std::endl;  break;
       default: break;
       }
     }
@@ -704,8 +719,11 @@ public:
     case OK:              break;
     case PROMOTE0_INT:    AdaptChild<ASTNode_ToInt>(0);    break;
     case PROMOTE0_DOUBLE: AdaptChild<ASTNode_ToDouble>(0); break;
+    case PROMOTE0_STRING: AdaptChild<ASTNode_ToString>(0); break;
     case PROMOTE1_INT:    AdaptChild<ASTNode_ToInt>(1);    break;
     case PROMOTE1_DOUBLE: AdaptChild<ASTNode_ToDouble>(1); break;
+    case PROMOTE1_STRING: AdaptChild<ASTNode_ToString>(1); break;
+    // I'm adapting in Parse. Will move it to here after I commit
     }
   }
 
