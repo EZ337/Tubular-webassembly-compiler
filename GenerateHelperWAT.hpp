@@ -15,7 +15,7 @@ using std::string;
 #include <cstdarg>  // For va_list
 
 // Function to generate the WAT function header
-// Credits to OpenAI ChatGPT
+// Credits to OpenAI ChatGPT. Modified by me
 void GenerateFunctionHeader(Control& control, std::string func_name, std::string func_return, ...) {
     va_list args;
     va_start(args, func_return);
@@ -32,7 +32,8 @@ void GenerateFunctionHeader(Control& control, std::string func_name, std::string
     }
 
     // Add the return type
-    resultString << " (result " << func_return << ")";
+    if (func_return != "")
+        resultString << " (result " << func_return << ")";
 
     // End argument list
     va_end(args);
@@ -65,7 +66,7 @@ void GenerateSizeFunction(Control& control)
         .Indent(2)
         .Code("(block $exit_while")
         .Indent(2)
-        .Code("(loop $while")
+        .Code("(loop $while").Indent(2)
         .CommentLine("While test condition")
         .Code("(i32.load8_u (local.get $i))")
         .Comment("Stack.push str[i]")
@@ -84,16 +85,55 @@ void GenerateSizeFunction(Control& control)
         .Code("(br $while)").Comment("continue")
         .Indent(-2)
         .Code(")").Indent(-2)
-        .Code(")").CommentLine("")
+        .Code(")").Indent(-2).CommentLine("")
         .Code("(local.get $len)").Comment("return len")
         .Indent(-2)
-        .Code(")").CommentLine("");
+        .Code(")");
     
     control.indent = original;  // Set it back to it's originl just for good measure
     
     control.Code("(export \"size\" (func $size))")
         .CommentLine("");
 
+}
+
+void GenerateStrCpy(Control& control)
+{
+    GenerateFunctionHeader(control, "_strcpy", "", "str i32", "dest i32", "amount i32", nullptr);
+
+    control.Indent(2)
+        .CommentLine("Variables")
+        .Code("(local $i i32)")
+        .CommentLine().CommentLine("Begin Code")
+
+        // Function body
+        .Code("(local.set $i (i32.const 0))").Comment("set loop counter to 0")
+        .CommentLine("Setup while")
+        .Code("(block $exit_while").Indent(2)
+        .Code("(loop $while").Indent(2)
+        .Code("(local.get $i)")
+        .Code("(local.get $amount)")
+        .Code("(i32.ge_s)").Comment("continue if i < amount")
+        .Code("(br_if $exit_while)").Comment("break if i >= amount")
+
+        .CommentLine("While body")
+        .Code("(i32.add (local.get $str) (local.get $i))").Comment("get char in str")
+        .Code("(i32.add (local.get $dest) (local.get $i))").Comment("get the dest location")
+        .Code("(i32.store8)").Comment("Store")
+
+        .CommentLine()
+        .CommentLine("Increment i")
+        .Code("(i32.add (local.get $i) (i32.const 1))")
+        .Code("(local.set $i)").Comment("set i to i+1")
+        .Code("(br $while)")
+        
+        // Close while
+        .Indent(-2).Code(')')
+        .Indent(-2).Code(')')
+        
+        // Closing
+        .Indent(-2)
+        .Code(")").CommentLine("");
 }
 
 void GenerateStrConcat(Control& control)
@@ -121,34 +161,25 @@ void GenerateStrConcat(Control& control)
         .Comment("(newPos = allocated_pos)")
         .CommentLine()
 
-        .CommentLine("Now call copy")
+        .CommentLine("copy str1")
         .Code("(local.get $str1)").Comment("str to copy")
         .Code("(local.get $newPos)").Comment("pos to copy to")
         .Code("(local.get $size1)").Comment("amount to copy (size of str1)")
         .Code("(call $_strcpy)")
+        .CommentLine("Now copy str2")
+        .Code("(local.get $str2)").Comment("str2 copy")
+        .Code("(local.get $newPos)").Comment("Get startPos")
+        .Code("(local.get $size1)").Comment("Offset")
+        .Code("(i32.add)").Comment("pos to copy to")
+        .Code("(local.get $size2)").Comment("amount to copy (size of str2)")
+        .Code("(call $_strcpy)")
 
-
+        .CommentLine()
+        .Code("(local.get $newPos)").Comment("return newStr pos")
         .Indent(-2)
         .Code(")").CommentLine("");
     
     control.indent = original;  // Set it back to it's originl just for good measure
-    control.Code("(export \"Concat\" (func $_str_concat))");
+    // control.Code("(export \"Concat\" (func $_str_concat))");
     control.CommentLine("");
 };
-
-void GenerateStrCpy(Control& control)
-{
-    GenerateFunctionHeader(control, "_strcpy", "i32", "str1 i32", "dest i32", "amount i32", nullptr);
-
-    control.Indent(2)
-        .CommentLine("Variables")
-        // Variables
-        .CommentLine()
-
-        // Function body
-        .Code("(local.get $str1)")  // for now return the string
-        
-        // Closing
-        .Indent(-2)
-        .Code(")").CommentLine("");
-}
