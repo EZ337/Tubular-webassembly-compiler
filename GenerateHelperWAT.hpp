@@ -101,7 +101,7 @@ void GenerateSizeFunction(Control& control)
 
 void GenerateStrCpy(Control& control)
 {
-    GenerateFunctionHeader(control, "_strcpy", "", "str i32", "dest i32", "amount i32", nullptr);
+    GenerateFunctionHeader(control, "_strcpy", "i32", "str i32", "dest i32", "amount i32", nullptr);
     
     control.Code("(local $i i32)")
         .CommentLine().CommentLine("Begin Code")
@@ -131,6 +131,7 @@ void GenerateStrCpy(Control& control)
         // Close while
         .Indent(-2).Code(')')
         .Indent(-2).Code(')')
+        .Code("(local.get $dest)").Comment("Return the starting index of new str")
         
         // Closing
         .Indent(-2)
@@ -165,13 +166,16 @@ void GenerateStrConcat(Control& control)
         .Code("(local.get $newPos)").Comment("pos to copy to")
         .Code("(local.get $size1)").Comment("amount to copy (size of str1)")
         .Code("(call $_strcpy)")
+        
         .CommentLine("Now copy str2")
-        .Code("(local.get $str2)").Comment("str2 copy")
-        .Code("(local.get $newPos)").Comment("Get startPos")
         .Code("(local.get $size1)").Comment("Offset")
         .Code("(i32.add)").Comment("pos to copy to")
+        .Code("(local.get $str2)").Comment("str2 copy")
+        // .Code("(local.get $newPos)").Comment("Get startPos")
+        .Code("(call $_i32swap)").Comment("Swap dest+offset with str2")
         .Code("(local.get $size2)").Comment("amount to copy (size of str2)")
         .Code("(call $_strcpy)")
+        .Drop().Comment("We don't want the start of the seconod string")
 
         .CommentLine()
         .Code("(local.get $newPos)").Comment("return newStr pos")
