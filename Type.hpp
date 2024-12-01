@@ -178,7 +178,7 @@ struct Type::Info_String : Type::Info_Base {
   bool IsString() const override {return true; }
   std::string Name() const override { return "string"; }
   std::string ToWAT() const override {return "i32"; } // TODO: Might need more
-  int BitCount() const override {return 22; } // I think?
+  int BitCount() const override {return 99; } // Set high to trump int
 
   std::unique_ptr<Info_Base> Clone() const override {
     return std::make_unique<Info_String>();

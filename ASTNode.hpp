@@ -642,12 +642,13 @@ public:
     bool align_numeric = false;
     if (op == "*") {
       if ((type0.IsInt()    && type1.IsInt()) ||
-          (type0.IsDouble() && type1.IsDouble()) ||
-          (type0.IsAlpha() && type1.IsInt())) {
+          (type0.IsDouble() && type1.IsDouble() ||
+          (type0.IsString() && type1.IsInt()))) {
         status = OK;
       }
       else if (type0.IsInt() && type1.IsDouble()) status = PROMOTE0_DOUBLE;
       else if (type0.IsDouble() && type1.IsInt()) status = PROMOTE1_DOUBLE;
+      else if (type0.IsChar() && type1.IsInt()) status = PROMOTE0_STRING;
     }
     else if (op == "/") {
       if ((type0.IsInt() && type1.IsInt()) ||
@@ -723,7 +724,6 @@ public:
     case PROMOTE1_INT:    AdaptChild<ASTNode_ToInt>(1);    break;
     case PROMOTE1_DOUBLE: AdaptChild<ASTNode_ToDouble>(1); break;
     case PROMOTE1_STRING: AdaptChild<ASTNode_ToString>(1); break;
-    // I'm adapting in Parse. Will move it to here after I commit
     }
   }
 
@@ -777,6 +777,11 @@ public:
     if (type.IsNumeric()) {
       // Standard mathematical multiple.
       control.Code("(", type.ToWAT(), ".mul)").Comment("Stack2 * Stack1");
+    }
+    else if (type.IsString())
+    {
+      control.CommentLine("Setup string mult")
+        .Code("(Insert function to duplicate strings)");
     }
   }
 
