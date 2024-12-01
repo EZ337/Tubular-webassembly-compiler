@@ -197,3 +197,14 @@ void GenerateCharToString(Control& control)
         .CommentLine("pos is already on the stack so return")
         .Indent(-2).Code(')').CommentLine();
 }
+
+void GenerateI32Swap(Control& control)
+{
+    control.CommentLine("Function to swap top 2 items on the stack. (both i32 version)");
+    GenerateFunctionHeader(control, "_i32swap", "i32 i32", "first i32", "second i32", nullptr);
+        
+    control.CommentLine("Now place them down in reverse order")
+        .Code("(local.get $second)")
+        .Code("(local.get $first)")
+        .Indent(-2).Code(")").CommentLine();
+}

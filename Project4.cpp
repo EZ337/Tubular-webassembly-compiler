@@ -469,6 +469,7 @@ public:
     // Generate the str_concat function
     GenerateStrConcat(control);
     GenerateCharToString(control);
+    GenerateI32Swap(control);
 
     for (auto & fun_ptr : functions) {
       fun_ptr->ToWAT(control);

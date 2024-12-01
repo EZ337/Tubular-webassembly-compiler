@@ -729,7 +729,7 @@ public:
 
   void ToWAT_Assign(Control & control) {
     if (!GetChild(0).CanAssign()) {
-      Error(file_pos, "Left-hand-side of assignment must be a variable.");
+      Error(file_pos, "Left-hand-side of assignment must be assignable.");
     }
     
     ChildToWAT(1, control, true);      // Generate the value to assign
@@ -1032,6 +1032,21 @@ public:
 
     // You need to support that type
     Error(file_pos, "Unsupported indexable type");
+
+    return Type(); // Unreached code
+  }
+
+  bool CanAssign() const override { return true; }
+
+  void ToAssignWAT(Control & control) override
+  {
+    assert(NumChildren() == 2);
+    control.CommentLine("Setup index assign operation");
+    ChildToWAT(0, control, true); // Put the variable's memory address on the stack
+    ChildToWAT(1, control, true); // Put the index number on the stack
+    control.Code("(i32.add)").Comment("Offset initial memory address")
+      .Code("(call $_i32swap)").Comment("Swap addr and item to store")
+      .Code("(i32.store8)").Comment("Assign");
   }
 
   void TypeCheck(const SymbolTable & symbols) override {
