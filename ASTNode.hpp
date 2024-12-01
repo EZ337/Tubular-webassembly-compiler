@@ -781,7 +781,7 @@ public:
     else if (type.IsString())
     {
       control.CommentLine("Setup string mult")
-        .Code("(Insert function to duplicate strings)");
+        .Code("(call $_dupe_mem)");
     }
   }
 
@@ -970,7 +970,7 @@ public:
   }
 
   bool ToWAT(Control& control) {
-    control.CommentLine("Function call setup");
+    control.CommentLine("Function call: ", fun_token.lexeme, "() setup");
     
     Type fun_type = control.symbols.GetType(fun_id);
 

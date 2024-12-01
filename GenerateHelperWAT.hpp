@@ -260,5 +260,5 @@ void GenerateDupeMem(Control& control)
         .Indent(-2).Code(")").Comment("Close while loop")
         .Indent(-2).Code(")").Comment("Close while block")
         .Code("(local.get $newPos)").Comment("return start of allocation addr")
-        .Indent(-2).Code(")").Comment("End _dupemem");
+        .Indent(-2).Code(")").Comment("End _dupemem").CommentLine();
 }
