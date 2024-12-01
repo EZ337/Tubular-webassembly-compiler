@@ -212,3 +212,53 @@ void GenerateI32Swap(Control& control)
         .Code("(local.get $first)")
         .Indent(-2).Code(")").CommentLine();
 }
+
+void GenerateDupeMem(Control& control)
+{
+    control.CommentLine("Function to duplicate src, amt times");
+    GenerateFunctionHeader(control, "_dupe_mem", "i32", "src i32", "amt i32", nullptr );
+
+    control.Code("(local $newPos i32)").Comment("start pos of allocated str")
+        .Code("(local $total i32)").Comment("The size to allocate")
+        .Code("(local $i i32)").Comment("Loop counter")
+        .Code("(local $src_size i32)")
+
+        .CommentLine().CommentLine("Begin Code")
+        .Code("(local.get $src)")
+        .Code("(call $size)").Comment("Get the size of str")
+        .Code("(local.set $src_size)")
+        .Code("(i32.mul (local.get $src_size) (local.get $amt))").Comment("Calculate total")
+        .Code("(local.set $total)")
+        .Code("(i32.add (local.get $total) (i32.const 1))").Comment("Add total_size and a nullterm")
+        .Code("(call $_alloc_str)").Comment("Allocate the space")
+        .Code("(local.set $newPos)")
+        
+        // While condition
+        .CommentLine().CommentLine("Setup while loop")
+        .Code("(local.set $i (i32.const 0))")
+        .Code("(block $exit_while").Indent(2)
+        .Code("(loop $while").Indent(2)
+        .CommentLine("Loop condition")
+        .Code("(i32.ge_s (local.get $i) (local.get $amt))").Comment("i < amt")
+        .Code("(br_if $exit_while)").Comment("break if i >= amt")
+        
+        // While body
+        .CommentLine("While body")
+        .Code("(local.get $src)").Comment("arg1")
+        .Code("(i32.mul (local.get $i) (local.get $src_size))").Comment("offset")
+        .Code("(local.get $newPos)").Comment("Add dest + offset")
+        .Code("(i32.add)").Comment("pos to insert new item. arg2")
+        .Code("(local.get $src_size)").Comment("arg3")
+        .Code("(call $_strcpy)")
+        .Drop().Comment("Not using it.")
+
+        // Increment i
+        .CommentLine("Increment i")
+        .Code("(local.set $i (i32.add (local.get $i) (i32.const 1)))")
+        .Code("(br $while)").Comment("Continue the loop")
+
+        .Indent(-2).Code(")").Comment("Close while loop")
+        .Indent(-2).Code(")").Comment("Close while block")
+        .Code("(local.get $newPos)").Comment("return start of allocation addr")
+        .Indent(-2).Code(")").Comment("End _dupemem");
+}

@@ -470,6 +470,7 @@ public:
     GenerateStrConcat(control);
     GenerateCharToString(control);
     GenerateI32Swap(control);
+    GenerateDupeMem(control);
 
     for (auto & fun_ptr : functions) {
       fun_ptr->ToWAT(control);
