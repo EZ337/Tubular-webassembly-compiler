@@ -1065,7 +1065,7 @@ public:
       Error(file_pos, var_type.Name(), " is not indexable");
     }
     if (!index_type.IsInt()){
-      Error(file_pos, "Expected int type for operator [], got ", index_type.ReturnType().Name());
+      Error(file_pos, "Expected int type for operator [], got ", index_type.Name());
     }
   }
 
