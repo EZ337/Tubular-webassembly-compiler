@@ -128,6 +128,30 @@ public:
     return id;
   }
 
+  /// @brief Creates an inbuilt function with pos 0,0
+  /// @param func_name Name of the function to create
+  /// @param param_types vector of the parameter types
+  /// @param return_type return type of the function
+  /// @return the id to the function
+  size_t AddInbuiltFunction(const std::string& func_name, 
+    const std::vector<Type>& param_types, Type return_type)
+  {
+    emplex::Token inbuilt_token{emplex::Lexer::ID_FUNCTION, func_name, 0, 0};
+
+    // Functions are always defined in the global scope.
+    scope_t & table = scope_stack[0];
+    if (table.count(func_name)) {
+      const auto & id = table[func_name];
+      Error("Inbuilt function ", func_name, " already exists");
+    }
+
+    const size_t id = var_array.size();
+    var_array.emplace_back(func_name, inbuilt_token, Type(param_types, return_type));
+    table[func_name] = id;
+
+    return id;
+  }
+
   // ----------- TYPE MANAGEMENT ------------
 
   const Type & GetType(size_t id) const { return At(id).type; }

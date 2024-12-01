@@ -37,6 +37,13 @@ void Error(FilePos file_pos, Ts... message) {
   exit(1);
 }
 
+template <typename... Ts>
+void Error(Ts... message) {
+  std::cerr << "ERROR: ";
+  (std::cerr << ... << std::forward<Ts>(message)) << std::endl;
+  exit(1);
+}
+
 template <auto... VALS, typename T>
 bool IsOneOf(T value) {
   return ((value == VALS) || ...);

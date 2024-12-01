@@ -85,6 +85,12 @@ private:
     op_map["="]  =                              OpInfo{cur_prec++, 'r'};
   }
 
+  void GenerateInbuiltFunctions() {
+    // size function
+    std::vector<Type> param_types{Type("string")};
+    control.symbols.AddInbuiltFunction("size", param_types, Type("int"));
+  }
+
 public:
   Tubular(std::string filename) {    
     std::ifstream in_file(filename);              // Load the input file
@@ -140,6 +146,10 @@ public:
       out = MakeNode<ASTNode_Math1>(token, std::move(out));
       break;
     
+    case emplex::Lexer::ID_SIZE:
+      out = Parse_Function_Call(token);
+      break;
+    
     case emplex::Lexer::ID_LIT_STRING:
       out = MakeNode<ASTNode_StringLit>(token);
       break;
@@ -192,7 +202,7 @@ public:
       if (op_info.assoc != 'r') --next_limit;
 
       // Load the next term.
-      ast_ptr_t node2 = Parse_Expression(next_limit);
+      ast_ptr_t node2 = std::move(Parse_Expression(next_limit));
 
       auto node1Type = cur_node.get()->ReturnType(control.symbols);
       auto node2Type = node2.get()->ReturnType(control.symbols);
@@ -227,7 +237,6 @@ public:
       case Lexer::ID_RETURN: return Parse_Statement_Return();
       case Lexer::ID_BREAK:  return Parse_Statement_Break();
       case Lexer::ID_CONTINUE: return Parse_Statement_Continue();
-      case Lexer::ID_SIZE: return Parse_Statement_Size();
       case '{': return Parse_StatementList();
       case ';':
         tokens.Use();
@@ -369,11 +378,6 @@ public:
     return varNode;
   }
 
-  ast_ptr_t Parse_Statement_Size()
-  {
-    auto token = tokens.Use(emplex::Lexer::ID_SIZE);
-    
-  }
 
   // A function has the format:
   //    function ID ( PARAMETERS ) : TYPE { STATEMENT_BLOCK }
@@ -422,6 +426,10 @@ public:
 
   void Parse() {
     // Outer layer can only be function definitions.
+    // First define inbuilt functions
+
+    GenerateInbuiltFunctions(); // Only size function for now
+
     while (tokens.Any()) {
       functions.push_back( Parse_Function() );
       functions.back()->TypeCheck(control.symbols);
