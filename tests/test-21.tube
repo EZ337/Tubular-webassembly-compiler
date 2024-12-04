@@ -1,0 +1,17 @@
+// Reverse a string recursively.
+function ReverseString(string s) : string {
+  int length = size(s);
+  if (length <= 1) return s;
+
+  char lastChar = s[length - 1]; // Extract the last character.
+  string remaining = ""; // Initialize an empty string.
+
+  // Rebuild the string without the last character using while.
+  int i = 0;
+  while (i < length - 1) {
+    remaining = remaining + s[i];
+    i = i + 1;
+  }
+
+  return lastChar + ReverseString(remaining); // Combine last character with the reversed substring.
+}

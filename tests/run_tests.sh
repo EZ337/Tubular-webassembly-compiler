@@ -3,7 +3,7 @@
 # Initialize a counter for differing files
 wat_count=0
 wasm_count=0
-test_count=20
+test_count=21
 
 error_pass_count=0
 error_fail_count=0
